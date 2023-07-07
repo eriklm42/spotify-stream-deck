@@ -1,6 +1,6 @@
-import config from "./config";
+import config from "./config.js";
 import { Controller } from "./controller.js";
-import { logger } from "./util.js";
+import { logger } from "./utils.js";
 import { once } from "events";
 const {
   location,
@@ -22,9 +22,13 @@ async function routes(request, response) {
       return response.end();
     }
 
-    if (url === "./controller") {
-      const { stream } = await controller.getFileStream(controllerHTML);
+    if (url === "/home") {
+      const { stream } = await controller.getFileStream(homeHTML);
+      return stream.pipe(response);
+    }
 
+    if (url === "/controller") {
+      const { stream } = await controller.getFileStream(controllerHTML);
       return stream.pipe(response);
     }
 
@@ -41,6 +45,7 @@ async function routes(request, response) {
     }
 
     const { stream, type } = await controller.getFileStream(url);
+
     const contentType = CONTENT_TYPE[type];
     if (contentType) {
       response.writeHead(200, {

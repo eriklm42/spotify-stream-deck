@@ -1,7 +1,7 @@
 import { expect, describe, test, jest, beforeEach } from "@jest/globals";
-import { Controller } from "../../server/controller.js";
-import { Service } from "../../server/service.js";
-import TestUtil from "../unit/_util/testUtil.js";
+import { Controller } from "../../../server/controller.js";
+import { Service } from "../../../server/service.js";
+import TestUtil from "../_util/testUtil.js";
 
 describe("#Controller - test suite for controller calls", () => {
   beforeEach(() => {
@@ -21,8 +21,8 @@ describe("#Controller - test suite for controller calls", () => {
     const controller = new Controller();
     const { stream, type } = await controller.getFileStream(mockFileName);
 
-    expect(stream).toStringEqual(mockStream);
-    expect(type).toStringEqual(mockType);
+    expect(stream).toStrictEqual(mockStream);
+    expect(type).toStrictEqual(mockType);
   });
 
   test("#createClientStream", async () => {
@@ -40,7 +40,7 @@ describe("#Controller - test suite for controller calls", () => {
 
     onClose();
 
-    expect(stream).toStringEqual(mockStream);
+    expect(stream).toStrictEqual(mockStream);
     expect(Service.prototype.removeClientStream).toHaveBeenCalledWith(mockId);
     expect(Service.prototype.createClientStream).toHaveBeenCalled();
   });
@@ -53,7 +53,7 @@ describe("handleCommand", () => {
     const data = { command: " stop " };
     const result = await controller.handleCommand(data);
 
-    expect(result).toStringEqual({ result: "ok" });
+    expect(result).toStrictEqual({ result: "ok" });
     expect(Service.prototype.stopStreaming).toHaveBeenCalled();
   });
 
@@ -63,7 +63,7 @@ describe("handleCommand", () => {
     const data = { command: " start " };
     const result = await controller.handleCommand(data);
 
-    expect(result).toStringEqual({ result: "ok" });
+    expect(result).toStrictEqual({ result: "ok" });
     expect(Service.prototype.startStreaming).toHaveBeenCalled();
   });
 
@@ -75,7 +75,7 @@ describe("handleCommand", () => {
     const data = { command: "MY_FY_NAME" }
     const result = await controller.handleCommand(data)
   
-    expect(result).toStringEqual({ result: "ok" })
+    expect(result).toStrictEqual({ result: "ok" })
     expect(Service.prototype.readFxByName).toHaveBeenCalledWith(data.command.toLowerCase())
     expect(Service.prototype.appendFxStream).toHaveBeenCalledWith(fxName)
   });

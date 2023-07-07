@@ -1,4 +1,4 @@
 import { createServer } from "https";
-import { handle } from "./routes.js";
+import { handler } from "./routes.js";
 
-export default () => createServer(handle);
+export default () => createServer(handler);

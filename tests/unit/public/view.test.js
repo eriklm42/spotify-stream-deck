@@ -5,7 +5,7 @@ import View from "./../../../public/controller/js/view.js";
 
 describe("#View - test suite for presentation layer", () => {
   const dom = new JSDOM();
-  global.document = dom.widow.document;
+  global.document = dom.window.document;
   global.window = dom.window;
 
   function makeBtnElement(
@@ -19,7 +19,7 @@ describe("#View - test suite for presentation layer", () => {
   ) {
     return {
       onclick: jest.fn(),
-      classLit,
+      classList,
       innerText: text,
     };
   }
@@ -68,7 +68,7 @@ describe("#View - test suite for presentation layer", () => {
 
     jest.spyOn(view, view.changeCommandBtnsVisibility.name).mockReturnValue();
 
-    const value = ok;
+    const value = "ok";
 
     jest.spyOn(view, view.onStartClicked.name).mockReturnValue(value);
 
@@ -105,7 +105,7 @@ describe("#View - test suite for presentation layer", () => {
     expect(view.toggleBtnStart).toHaveBeenCalled();
     expect(view.onBtnClick).toHaveBeenCalledWith(text);
     expect(view.changeCommandBtnsVisibility).toHaveBeenCalledWith(false);
-    expect(view.notIsUnassignedButton).toHaveBeenCalledWith(1, btn);
+    expect(view.notIsUnassignedButton).toHaveBeenNthCalledWith(1, btn);
 
     const [calls] = view.setupBtnAction.mock.calls[0];
 
@@ -134,7 +134,7 @@ describe("#View - test suite for presentation layer", () => {
     const view = new View();
     view.setupBtnAction(btn);
     const result = btn.onclick();
-    const expected = jest.fn();
+    const expected = jest.fn()();
     expect(result).toStrictEqual(expected);
   });
 
@@ -172,11 +172,11 @@ describe("#View - test suite for presentation layer", () => {
     expect(view.onBtnClick).toHaveBeenCalledWith(text);
   });
 
-  test("#toggleDisableCOmmandBtn active=true should add hidden class", () => {
+  test("#toggleDisableCommandBtn active=true should add hidden class", () => {
     const classListWithoutActiveClass = makeClassListElement();
     const view = new View();
     view.toggleDisableCommandBtn(classListWithoutActiveClass);
-    expect(classListWithoutActiveClass.size).toStrictEqual(2);
+    expect(classListWithoutActiveClass.size).toStrictEqual(1);
     expect([...classListWithoutActiveClass.values()]).toStrictEqual(["active"]);
   });
 
@@ -187,7 +187,7 @@ describe("#View - test suite for presentation layer", () => {
     view.toggleDisableCommandBtn(classListWithoutActiveClass);
 
     expect(classListWithoutActiveClass.size).toBeFalsy();
-    expect(classListWithActiveClass.has(cssClass)).toBeFalsy();
+    expect(classListWithoutActiveClass.has(cssClass)).toBeFalsy();
   });
 
   test("#onStopBtn", async () => {

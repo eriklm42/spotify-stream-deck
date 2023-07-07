@@ -8,7 +8,7 @@ import streamsPromises from "stream/promises";
 import Throttle from "throttle";
 import childProcess from "child_process";
 import { logger } from "./utils.js";
-import path, { join, extname } from "patch";
+import path, { join, extname } from "path";
 const {
   dir: { publicDirectory, fxDirectory },
   constants: { fallbackBitRate, englishConversation, bitRateDivisor, audioMediaType, songVolume, fxVolume },
@@ -16,7 +16,9 @@ const {
 
 export class Service {
   constructor() {
-    (this.clientStreams = new Map()), (this.currentSong = englishConversation), (this.currentBitRate = 0);
+    this.clientStreams = new Map();
+    this.currentSong = englishConversation;
+    this.currentBitRate = 0;
     this.throttleTransform = {};
     this.currentReadable = {};
   }
@@ -28,7 +30,7 @@ export class Service {
   createClientStream() {
     const id = randomUUID();
     const clientStream = new PassThrough();
-    this.clientStream.set(id, clientStream);
+    this.clientStreams.set(id, clientStream);
 
     return {
       id,
@@ -100,6 +102,11 @@ export class Service {
     };
   }
 
+  async getFileStream(file) {
+    const { name, type } = await this.getFileInfo(file);
+    return { stream: this.createFileStream(name), type };
+  }
+
   async readFxByName(fxName) {
     const songs = await fsPromises.readdir(fxDirectory);
     const chosenSong = songs.find((filename) => filename.toLowerCase().includes(fxName));
@@ -129,22 +136,7 @@ export class Service {
 
   mergeAudioStreams(song, readable) {
     const transformStream = PassThrough();
-    const args = [
-      "-t",
-      audioMediaType,
-      "-v",
-      songVolume,
-      "-m",
-      "-",
-      "-t",
-      audioMediaType,
-      "-v",
-      fxVolume,
-      song,
-      "-t",
-      audioMediaType,
-      "-",
-    ];
+    const args = ["-t", audioMediaType, "-v", songVolume, "-m", "-", "-t", audioMediaType, "-v", fxVolume, song, "-t", audioMediaType, "-"];
 
     const { stdout, stdin } = this._executeSoxCommand(args);
     streamsPromises.pipeline(readable, stdin);

@@ -23,7 +23,7 @@ describe("#Controller - test suite for controller calls", () => {
 
     const [calls] = deps.view.configureOnBtnClick.mock.lastCall;
 
-    expect(call.name).toStrictEqual(controller.commandReceived.bind(controller).name);
+    expect(calls.name).toStrictEqual(controller.commandReceived.bind(controller).name);
     expect(deps.view.onLoad).toHaveBeenCalled();
   });
 
