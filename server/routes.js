@@ -51,9 +51,8 @@ async function routes(request, response) {
       response.writeHead(200, {
         "Content-Type": contentType,
       });
-
-      return stream.pipe(response);
     }
+    return stream.pipe(response);
   }
 
   if (method === "POST" && url === "/controller") {
