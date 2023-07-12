@@ -53,7 +53,7 @@ export class Service {
 
       if (error) return await Promise.reject(error);
 
-      return success.toString().trim().replace("/k/", "000");
+      return success.toString().trim().replace(/k/, "000");
     } catch (error) {
       logger.error(`Error bitRate: ${error}`);
       return fallbackBitRate;
@@ -78,9 +78,9 @@ export class Service {
 
   async startStreaming() {
     logger.info(`starting with ${this.currentSong}`);
-    const bitRate = (this.currentBitRate = (await this.getBitRate(this.currentSong)) / bitRateDivisor);
-    const throttleTransform = (this.throttleTransform = new Throttle(bitRate));
-    const songReadable = (this.currentReadable = this.createFileStream(this.currentSong));
+    const bitRate = this.currentBitRate = (await this.getBitRate(this.currentSong)) / bitRateDivisor;
+    const throttleTransform = this.throttleTransform = new Throttle(bitRate);
+    const songReadable = this.currentReadable = this.createFileStream(this.currentSong);
     return streamsPromises.pipeline(songReadable, throttleTransform, this.broadCast());
   }
 
@@ -136,7 +136,16 @@ export class Service {
 
   mergeAudioStreams(song, readable) {
     const transformStream = PassThrough();
-    const args = ["-t", audioMediaType, "-v", songVolume, "-m", "-", "-t", audioMediaType, "-v", fxVolume, song, "-t", audioMediaType, "-"];
+    const args = [
+      "-t", audioMediaType, 
+      "-v", songVolume, 
+      "-m", "-", 
+      "-t", audioMediaType, 
+      "-v", fxVolume, 
+      song, 
+      "-t", audioMediaType, 
+      "-"
+    ];
 
     const { stdout, stdin } = this._executeSoxCommand(args);
     streamsPromises.pipeline(readable, stdin);

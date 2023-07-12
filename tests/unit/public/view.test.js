@@ -36,26 +36,29 @@ describe("#View - test suite for presentation layer", () => {
     jest.spyOn(document, "getElementById").mockReturnValue(makeBtnElement());
   });
 
-  test("#changeCommandBtnsVisibility - given hide=true it should add unassigned class and reset onclick", () => {
+  test('#changeCommandBtnsVisibility - given hide=true it should add unassigned class and reset onclick', () => {
+    const view = new View()
+    const btn = makeBtnElement()
+    jest.spyOn(
+      document,
+      "querySelectorAll"
+    ).mockReturnValue([btn])
+      
+    view.changeCommandBtnsVisibility()
+    
+    expect(btn.classList.add).toHaveBeenCalledWith('unassigned')
+    expect(btn.onclick.name).toStrictEqual('onClickReset')
+    expect(() => btn.onclick()).not.toThrow()
+
+  })
+
+  test("#changeCommandBtnsVisibility - given hide=false it should remove unassigned class and reset onclick", () => {
     const view = new View();
     const btn = makeBtnElement();
 
     jest.spyOn(document, "querySelectorAll").mockReturnValue([btn]);
 
-    view.changeCommandBtnsVisibility();
-
-    expect(btn.classList.add).toHaveBeenCalledWith("unassigned");
-    expect(btn.onclick.name).toStrictEqual("onClickReset");
-    expect(() => btn.onclick()).not.toThrow();
-  });
-
-  test("#changeCommandBtnsVisibility - given hide=true it should remove unassigned class and reset onclick", () => {
-    const view = new View();
-    const btn = makeBtnElement();
-
-    jest.spyOn(document, "querySelectorAll").mockReturnValue([btn]);
-
-    view.changeCommandBtnsVisibility();
+    view.changeCommandBtnsVisibility(false);
 
     expect(btn.classList.add).not.toHaveBeenCalled();
     expect(btn.classList.remove).toHaveBeenCalledWith("unassigned");
@@ -63,7 +66,7 @@ describe("#View - test suite for presentation layer", () => {
     expect(() => btn.onclick()).not.toThrow();
   });
 
-  test("#nLoad", () => {
+  test("#onLoad", () => {
     const view = new View();
 
     jest.spyOn(view, view.changeCommandBtnsVisibility.name).mockReturnValue();

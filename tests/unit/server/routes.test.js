@@ -64,7 +64,7 @@ describe("#Routes = test site for api response", () => {
 
   test(`GET /index.html - should response with file stream`, async () => {
     const params = TestUtil.defaultHandleParams();
-    const filename = "/index.js";
+    const filename = "/index.html";
     params.request.method = "GET";
     params.request.url = filename;
     const expectedType = ".html";
@@ -92,7 +92,10 @@ describe("#Routes = test site for api response", () => {
     const expectedType = ".ext";
     const mockFileStream = TestUtil.generateReadableStream(["data"]);
 
-    jest.spyOn(Controller.prototype, Controller.prototype.getFileStream.name).mockResolvedValue({
+    jest.spyOn(
+      Controller.prototype, 
+      Controller.prototype.getFileStream.name
+    ).mockResolvedValue({
       stream: mockFileStream,
       type: expectedType,
     });
@@ -106,27 +109,17 @@ describe("#Routes = test site for api response", () => {
     expect(params.response.writeHead).not.toHaveBeenCalled();
   });
 
-  test(`POST /unknown - given an inexistent route it should response with 404`, async () => {
+  test(`GET /stream?id=123 - should call createClientStream`, async () => {
     const params = TestUtil.defaultHandleParams();
-    params.request.method = "POST";
-    params.request.url = "/unknown";
-
-    await handler(...params.values());
-
-    expect(params.response.writeHead).toHaveBeenCalledWith(404);
-    expect(params.response.end).toHaveBeenCalled();
-  });
-
-  test(`POST /stream?id=123 - should call createClientStream`, async () => {
-    const params = TestUtil.defaultHandleParams();
-    params.request.method = "POST";
+    params.request.method = "GET";
     params.request.url = "/stream";
 
-    const mockFileStream = TestUtil.generateReadableStream(["test"]);
+    const stream = TestUtil.generateReadableStream(["test"]);
     const onClose = jest.fn();
-
-    jest.spyOn(mockFileStream, "pipe").mockReturnValue();
-    jest.spyOn(Controller.prototype, Controller.createClientStream.name).mockReturnValue({
+    
+    jest.spyOn(stream, "pipe").mockReturnValue();
+    jest.spyOn(Controller.prototype, Controller.prototype.createClientStream.name)
+    .mockReturnValue({
       onClose,
       stream,
     });
@@ -138,10 +131,21 @@ describe("#Routes = test site for api response", () => {
       "Content-Type": "audio/mpeg",
       "Accept-Ranges": "bytes",
     });
-
+    
     expect(Controller.prototype.createClientStream).toHaveBeenCalled();
     expect(stream.pipe).toHaveBeenCalledWith(params.response);
     expect(onClose).toHaveBeenCalled();
+  });
+
+  test(`POST /unknown - given an inexistent route it should response with 404`, async () => {
+    const params = TestUtil.defaultHandleParams();
+    params.request.method = "POST";
+    params.request.url = "/unknown";
+
+    await handler(...params.values());
+
+    expect(params.response.writeHead).toHaveBeenCalledWith(404);
+    expect(params.response.end).toHaveBeenCalled();
   });
 
   test("POST /controller - should call handleCommand", async () => {
