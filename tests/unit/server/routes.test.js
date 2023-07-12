@@ -124,14 +124,13 @@ describe("#Routes = test site for api response", () => {
       stream,
     });
 
-    params.request.emit("close");
     await handler(...params.values());
+    params.request.emit("close");
 
     expect(params.response.writeHead).toHaveBeenCalledWith(200, {
       "Content-Type": "audio/mpeg",
       "Accept-Ranges": "bytes",
     });
-    
     expect(Controller.prototype.createClientStream).toHaveBeenCalled();
     expect(stream.pipe).toHaveBeenCalledWith(params.response);
     expect(onClose).toHaveBeenCalled();
